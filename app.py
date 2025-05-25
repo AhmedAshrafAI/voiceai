@@ -11,6 +11,7 @@ API_KEY_MUNSIT = "sk-ctxt-55aab0ddf2334452b0a44872c7c54b39"
 API_KEY_VOICEFLOW = "VF.DM.681d292aea78babcc654acaf.JSuEQdV5KSHXu3px"
 ELEVENLABS_API_KEY = "sk_83d455e3ed2bc6a6169df3fb04a6926e6852c02530007797"
 VOICE_ID = "IES4nrmZdUBHByLBde0P"
+VOICEFLOW_USER_ID = "default-user"
 
 # Record audio using Streamlit mic recorder
 def record_audio():
