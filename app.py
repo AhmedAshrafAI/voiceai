@@ -6,11 +6,11 @@ import io
 from io import BytesIO
 import time
 
-# Get API Keys from secrets
-API_KEY_MUNSIT = st.secrets["MUNSIT_API_KEY"]
-API_KEY_VOICEFLOW = st.secrets["VOICEFLOW_API_KEY"]
-ELEVENLABS_API_KEY = st.secrets["ELEVENLABS_API_KEY"]
-VOICE_ID = st.secrets["VOICE_ID"]
+# API Keys for Voice AI Assistant
+API_KEY_MUNSIT = "sk-ctxt-55aab0ddf2334452b0a44872c7c54b39"
+API_KEY_VOICEFLOW = "VF.DM.681d292aea78babcc654acaf.JSuEQdV5KSHXu3px"
+ELEVENLABS_API_KEY = "sk_83d455e3ed2bc6a6169df3fb04a6926e6852c02530007797"
+VOICE_ID = "IES4nrmZdUBHByLBde0P"
 
 # Record audio using Streamlit mic recorder
 def record_audio():
