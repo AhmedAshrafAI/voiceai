@@ -153,16 +153,22 @@ def convert_text_to_speech(text):
 st.title("Voice AI Assistant")
 st.write("Welcome to the Voice AI Assistant! Click the microphone button below to start recording your message.")
 
-# Initialize session state for chat history
+# Initialize session state for chat history and recording state
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
+if 'waiting_for_record' not in st.session_state:
+    st.session_state.waiting_for_record = True
 
 # Create two columns for chat display
 col1, col2 = st.columns([3, 1])
 
 # Record and process audio
 with col2:
-    audio_data = record_audio()
+    if st.session_state.waiting_for_record:
+        audio_data = record_audio()
+    else:
+        st.info("Processing response...")
+        audio_data = None
 
 with col1:
     # Display chat history
@@ -173,6 +179,7 @@ with col1:
                 st.audio(message["audio"], format=message["format"])
 
     if audio_data:
+        st.session_state.waiting_for_record = False
         with st.spinner("Processing your message..."):
             transcription = transcribe_with_munsit(audio_data)
             if transcription:
@@ -201,6 +208,9 @@ with col1:
                     # Clear the last user's audio from chat history after playing AI response
                     if len(st.session_state.chat_history) >= 2:
                         st.session_state.chat_history[-2]["audio"] = None
+                    
+                    # Enable recording for next interaction
+                    st.session_state.waiting_for_record = True
                     
                     # Rerun to update the chat display
                     st.rerun()
