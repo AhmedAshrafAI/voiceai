@@ -130,9 +130,9 @@ def convert_text_to_speech(text):
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
         # Generate audio using the correct method
-        audio = client.generate(
-            text=text,
+        audio = .text_to_speech.convert(
             voice_id=VOICE_ID,
+            text=text,
             model_id="eleven_multilingual_v2"
         )
         
