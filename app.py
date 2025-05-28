@@ -124,25 +124,20 @@ def interact_with_voiceflow(user_input):
         return None
 
 # Convert text to speech using ElevenLabs
+# Convert text to speech using ElevenLabs
 def convert_text_to_speech(text):
     try:
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
-        # Get audio stream
-        audio_stream = client.text_to_speech.convert_as_stream(
+        # Generate audio using the correct method
+        audio = client.generate(
             text=text,
             voice_id=VOICE_ID,
-            model_id="eleven_multilingual_v2",
-            output_format="mp3_44100_128"
+            model_id="eleven_multilingual_v2"
         )
-
-        # Collect audio data
-        audio_data = BytesIO()
-        for chunk in audio_stream:
-            if isinstance(chunk, bytes):
-                audio_data.write(chunk)
         
-        # Reset buffer position and return audio
+        # Convert audio data to bytes
+        audio_data = BytesIO(audio)
         audio_data.seek(0)
         return audio_data.getvalue()
     except Exception as e:
@@ -162,7 +157,7 @@ if audio_data:
             st.write("You said:", transcription)
             
             # Get AI response
-            response = interact_with_voiceflow(transcription)
+            response = interact_with_voiceflow("ايه البيانات الي عندكو عن " + transcription )
             if response:
                 st.write("AI response:", response)
                 
