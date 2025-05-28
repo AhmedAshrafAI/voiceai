@@ -132,6 +132,7 @@ def convert_text_to_speech(text):
         # Generate audio using the correct method
         audio = client.text_to_speech.convert(
             voice_id=VOICE_ID,
+            output_format="mp3_44100_128",
             text=text,
             model_id="eleven_multilingual_v2"
         )
