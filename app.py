@@ -205,12 +205,10 @@ with col1:
                         "format": "audio/mp3"
                     })
                     
-                    # Clear the last user's audio from chat history after playing AI response
-                    if len(st.session_state.chat_history) >= 2:
-                        st.session_state.chat_history[-2]["audio"] = None
-                    
                     # Enable recording for next interaction
                     st.session_state.waiting_for_record = True
                     
                     # Rerun to update the chat display
                     st.rerun()
+
+                    audio_data = None
