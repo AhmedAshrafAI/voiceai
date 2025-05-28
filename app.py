@@ -130,15 +130,19 @@ def convert_text_to_speech(text):
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
         # Generate audio using the correct method
-        audio = client.text_to_speech.convert(
+        audio_generator = client.text_to_speech.convert(
             voice_id=VOICE_ID,
             output_format="mp3_44100_128",
             text=text,
             model_id="eleven_multilingual_v2"
         )
         
-        # Convert audio data to bytes
-        audio_data = BytesIO(audio)
+        # Convert generator to bytes
+        audio_data = BytesIO()
+        for chunk in audio_generator:
+            if chunk is not None:
+                audio_data.write(chunk)
+        
         audio_data.seek(0)
         return audio_data.getvalue()
     except Exception as e:
