@@ -54,29 +54,28 @@ def record_audio():
 # Transcribe using Munsit API
 def transcribe_with_munsit(audio_bytes):
     try:
-        # Prepare the API request
         headers = {
             "Authorization": f"Bearer {API_KEY_MUNSIT}"
         }
-        
+
         files = {
             "file": ("audio.mp3", io.BytesIO(audio_bytes), "audio/mpeg")
         }
-        
         data = {
             "model": "munsit-1"
         }
-        
         response = requests.post(
             "https://api.cntxt.tools/audio/transcribe",
             headers=headers,
             files=files,
             data=data
         )
-        
         response.raise_for_status()
+
         result = response.json()
-        return result["text"]
+        text = result["data"]["transcription"]
+        return text
+
     except Exception as e:
         st.error(f"Transcription API error: {str(e)}")
         return None
