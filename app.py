@@ -153,20 +153,50 @@ def convert_text_to_speech(text):
 st.title("Voice AI Assistant")
 st.write("Welcome to the Voice AI Assistant! Click the microphone button below to start recording your message.")
 
+# Initialize session state for chat history
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
+
+# Create two columns for chat display
+col1, col2 = st.columns([3, 1])
+
 # Record and process audio
-audio_data = record_audio()
-if audio_data:
-    with st.spinner("Processing your message..."):
-        transcription = transcribe_with_munsit(audio_data)
-        if transcription:
-            st.write("You said:", transcription)
-            
-            # Get AI response
-            response = interact_with_voiceflow(transcription)
-            if response:
-                st.write("AI response:", response)
+with col2:
+    audio_data = record_audio()
+
+with col1:
+    # Display chat history
+    for message in st.session_state.chat_history:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
+            if message.get("audio"):
+                st.audio(message["audio"], format=message["format"])
+
+    if audio_data:
+        with st.spinner("Processing your message..."):
+            transcription = transcribe_with_munsit(audio_data)
+            if transcription:
+                # Add user message to chat history
+                st.session_state.chat_history.append({
+                    "role": "user",
+                    "content": transcription,
+                    "audio": audio_data,
+                    "format": "audio/wav"
+                })
                 
-                # Convert response to speech
-                audio_response = convert_text_to_speech(response)
-                if audio_response:
-                    st.audio(audio_response, format="audio/mp3")
+                # Get AI response
+                response = interact_with_voiceflow(transcription)
+                if response:
+                    # Convert response to speech
+                    audio_response = convert_text_to_speech(response)
+                    
+                    # Add assistant response to chat history
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": response,
+                        "audio": audio_response,
+                        "format": "audio/mp3"
+                    })
+                    
+                    # Rerun to update the chat display
+                    st.rerun()
