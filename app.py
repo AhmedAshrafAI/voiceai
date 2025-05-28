@@ -17,49 +17,53 @@ VOICEFLOW_USER_ID = "default-user"
 def record_audio():
     st.markdown("### Recording Instructions:")
     st.markdown("""
+
     1. Click the microphone button below
+
     2. When recording, speak clearly into your microphone
+
     3. Click the button again to stop recording
+
     4. Wait for the audio to process
+
     """)
     
-    # Initialize session state for audio recording
     if 'recorder_key' not in st.session_state:
         st.session_state.recorder_key = 'recorder_' + str(int(time.time()))
     if 'audio_bytes' not in st.session_state:
         st.session_state.audio_bytes = None
     
+
     def audio_callback():
         if st.session_state[st.session_state.recorder_key + '_output']:
             st.session_state.audio_bytes = st.session_state[st.session_state.recorder_key + '_output']['bytes']
-    
-    # Create a container for the recorder
+
     recorder_container = st.container()
+
     with recorder_container:
         mic_recorder(
             start_prompt="Start Recording",
             stop_prompt="Stop Recording", 
             key=st.session_state.recorder_key,
-            callback=audio_callback
+            callback=audio_callback,
+            format="wav",
         )
-    
     if st.session_state.audio_bytes is not None:
-        # Preview the recorded audio
         st.audio(st.session_state.audio_bytes, format="audio/wav")
         return st.session_state.audio_bytes
-    
     st.info("Click the button to start recording...")
     return None
 
 # Transcribe using Munsit API
 def transcribe_with_munsit(audio_bytes):
+    print(audio_bytes[:500])
     try:
         headers = {
             "Authorization": f"Bearer {API_KEY_MUNSIT}"
         }
 
         files = {
-            "file": ("audio.mp3", io.BytesIO(audio_bytes), "audio/mpeg")
+            "file": ("audio.wav", io.BytesIO(audio_bytes), "audio/wav")
         }
         data = {
             "model": "munsit-1"
@@ -68,14 +72,12 @@ def transcribe_with_munsit(audio_bytes):
             "https://api.cntxt.tools/audio/transcribe",
             headers=headers,
             files=files,
-            data=data
+            data=data,
         )
         response.raise_for_status()
-
         result = response.json()
         text = result["data"]["transcription"]
         return text
-
     except Exception as e:
         st.error(f"Transcription API error: {str(e)}")
         return None
@@ -155,7 +157,6 @@ st.write("Welcome to the Voice AI Assistant! Click the microphone button below t
 audio_data = record_audio()
 if audio_data:
     with st.spinner("Processing your message..."):
-        # Transcribe audio
         transcription = transcribe_with_munsit(audio_data)
         if transcription:
             st.write("You said:", transcription)
