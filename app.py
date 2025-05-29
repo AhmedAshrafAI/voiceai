@@ -13,6 +13,25 @@ ELEVENLABS_API_KEY = "sk_64d1c334fda63585d8558ab6e5d06b6c7316deec5f3abbd5"
 VOICE_ID = "IES4nrmZdUBHByLBde0P"
 VOICEFLOW_USER_ID = "default-user"
 
+def login():
+    if 'logged_in' not in st.session_state:
+        st.session_state.logged_in = False
+
+    if not st.session_state.logged_in:
+        st.title("Login to Voice AI Assistant")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        
+        if st.button("Login"):
+            if username == "admin" and password == "admin":
+                st.session_state.logged_in = True
+                st.success("Logged in successfully!")
+                st.experimental_rerun()
+            else:
+                st.error("Invalid credentials")
+        return st.session_state.logged_in
+    return True
+
 # Record audio using Streamlit mic recorder
 def record_audio():
     st.markdown("### Recording Instructions:")
@@ -33,7 +52,6 @@ def record_audio():
     if 'audio_bytes' not in st.session_state:
         st.session_state.audio_bytes = None
     
-
     def audio_callback():
         if st.session_state[st.session_state.recorder_key + '_output']:
             st.session_state.audio_bytes = st.session_state[st.session_state.recorder_key + '_output']['bytes']
@@ -56,7 +74,6 @@ def record_audio():
 
 # Transcribe using Munsit API
 def transcribe_with_munsit(audio_bytes):
-    print(audio_bytes[:500])
     try:
         headers = {
             "Authorization": f"Bearer {API_KEY_MUNSIT}"
@@ -124,7 +141,6 @@ def interact_with_voiceflow(user_input):
         return None
 
 # Convert text to speech using ElevenLabs
-# Convert text to speech using ElevenLabs
 def convert_text_to_speech(text):
     try:
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
@@ -150,23 +166,29 @@ def convert_text_to_speech(text):
         return None
 
 # Main app
-st.title("Voice AI Assistant")
-st.write("Welcome to the Voice AI Assistant! Click the microphone button below to start recording your message.")
+if login():
+    st.title("Voice AI Assistant")
+    st.write("Welcome to the Voice AI Assistant! Click the microphone button below to start recording your message.")
 
-# Record and process audio
-audio_data = record_audio()
-if audio_data:
-    with st.spinner("Processing your message..."):
-        transcription = transcribe_with_munsit(audio_data)
-        if transcription:
-            st.write("You said:", transcription)
-            
-            # Get AI response
-            response = interact_with_voiceflow("ايه البيانات الي عندكو عن " + transcription )
-            if response:
-                st.write("AI response:", response)
+    # Add logout button
+    if st.sidebar.button("Logout"):
+        st.session_state.logged_in = False
+        st.experimental_rerun()
+
+    # Record and process audio
+    audio_data = record_audio()
+    if audio_data:
+        with st.spinner("Processing your message..."):
+            transcription = transcribe_with_munsit(audio_data)
+            if transcription:
+                st.write("You said:", transcription)
                 
-                # Convert response to speech
-                audio_response = convert_text_to_speech(response)
-                if audio_response:
-                    st.audio(audio_response, format="audio/mp3")
+                # Get AI response
+                response = interact_with_voiceflow("ايه البيانات الي عندكو عن " + transcription)
+                if response:
+                    st.write("AI response:", response)
+                    
+                    # Convert response to speech
+                    audio_response = convert_text_to_speech(response)
+                    if audio_response:
+                        st.audio(audio_response, format="audio/mp3")
