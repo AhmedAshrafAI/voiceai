@@ -26,7 +26,7 @@ def login():
             if username == "admin" and password == "admin":
                 st.session_state.logged_in = True
                 st.success("Logged in successfully!")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Invalid credentials")
         return st.session_state.logged_in
@@ -173,7 +173,7 @@ if login():
     # Add logout button
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
-        st.experimental_rerun()
+        st.rerun()
 
     # Record and process audio
     audio_data = record_audio()
